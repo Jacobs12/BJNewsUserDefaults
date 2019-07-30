@@ -26,6 +26,15 @@
 //    [user deleteValueWithKey:@"key1"];
 //    [user updateValuesWithDictionary:@{@"key6":@"aaaaaaa",@"key7":@"bbbbbbb",@"key8":@"ccccccccc"}];
 //    [user deleteAllObjects];
+    
+    BJNewsUserDefaults * user2 = [BJNewsUserDefaults userDefaultsWithSuiteName:@"xiyangyang"];
+//    [user2 updateValue:@"akkak" withKey:@"ak"];
+    [user2 deleteObjectWithKey:@"key1"];
+    
+    
+    
+    NSLog(@"%@",[user2 valueForKey:@"ak"]);
+
 }
 
 

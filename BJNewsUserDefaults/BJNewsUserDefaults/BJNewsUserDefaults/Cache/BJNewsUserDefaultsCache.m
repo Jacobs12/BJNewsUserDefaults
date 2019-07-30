@@ -23,6 +23,11 @@
     return self;
 }
 
+#pragma mark - 路径
+
+/**
+  文件存储目录
+ */
 - (NSString *)basePath{
     NSString * basePath = [NSHomeDirectory() stringByAppendingPathComponent:@"/Library/Caches/User"];
     BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:basePath];
@@ -32,11 +37,16 @@
     return basePath;
 }
 
+/**
+ 文件存储路径
+ */
 - (NSString *)filePath{
     NSString * basePath = [self basePath];
     NSString * path = [NSString stringWithFormat:@"%@/%@.plist",basePath,self.suiteName];
     return path;
 }
+
+#pragma mark - 写入
 
 - (void)writeWithDictionary:(NSDictionary *)dictionary{
     if(dictionary == nil || ![dictionary isKindOfClass:[NSDictionary class]]){
