@@ -19,8 +19,13 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     NSLog(@"%@",NSHomeDirectory());
-    BJNewsUserDefaults * user = [BJNewsUserDefaults userDefaultsWithSuiteName:@"userName"];
+    BJNewsUserDefaults * user = [BJNewsUserDefaults userDefaultsWithSuiteName:@"wolffy"];
     NSLog(@"%@",[user dictionary]);
+    [user updateValue:[NSNull null] withKey:@"key2"];
+//    [user updateValue:@"asdasdasdasd" withKey:@"key2"];
+//    [user deleteValueWithKey:@"key1"];
+//    [user updateValuesWithDictionary:@{@"key6":@"aaaaaaa",@"key7":@"bbbbbbb",@"key8":@"ccccccccc"}];
+//    [user deleteAllObjects];
 }
 
 
