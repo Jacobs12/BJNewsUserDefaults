@@ -11,6 +11,9 @@
 
 @interface BJNewsUserDefaults ()
 
+/**
+ 持久化存储管理类
+ */
 @property (nonatomic,strong) BJNewsUserDefaultsCache * cacheManager;
 
 @end
@@ -40,6 +43,9 @@
     return user;
 }
 
+/**
+  持久化存储管理类
+ */
 - (BJNewsUserDefaultsCache *)cacheManager{
     if(_cacheManager == nil){
         _cacheManager = [[BJNewsUserDefaultsCache alloc]initWithSuiteName:self.suiteName];

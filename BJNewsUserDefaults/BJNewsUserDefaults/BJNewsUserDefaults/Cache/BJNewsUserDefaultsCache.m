@@ -48,6 +48,11 @@
 
 #pragma mark - 写入
 
+/**
+ 将dictionary写入到本地
+
+ @param dictionary dictionary
+ */
 - (void)writeWithDictionary:(NSDictionary *)dictionary{
     if(dictionary == nil || ![dictionary isKindOfClass:[NSDictionary class]]){
         return;

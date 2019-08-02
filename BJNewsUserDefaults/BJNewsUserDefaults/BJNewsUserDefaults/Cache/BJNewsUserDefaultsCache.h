@@ -10,6 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ 数据持久化管理类
+ */
 @interface BJNewsUserDefaultsCache : NSObject
 
 /**
