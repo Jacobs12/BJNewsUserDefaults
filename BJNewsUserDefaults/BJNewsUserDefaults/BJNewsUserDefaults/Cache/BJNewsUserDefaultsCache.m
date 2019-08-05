@@ -29,7 +29,7 @@
   文件存储目录
  */
 - (NSString *)basePath{
-    NSString * basePath = [NSHomeDirectory() stringByAppendingPathComponent:@"/Library/Caches/User"];
+    NSString * basePath = [NSHomeDirectory() stringByAppendingPathComponent:@"/Library/Caches/user_cache"];
     BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:basePath];
     if(isExist == NO){
         [[NSFileManager defaultManager] createDirectoryAtPath:basePath withIntermediateDirectories:YES attributes:@{} error:nil];
@@ -54,14 +54,20 @@
  @param dictionary dictionary
  */
 - (void)writeWithDictionary:(NSDictionary *)dictionary{
-    if(dictionary == nil || ![dictionary isKindOfClass:[NSDictionary class]]){
-        return;
+    @try {
+        if(dictionary == nil || ![dictionary isKindOfClass:[NSDictionary class]]){
+            return;
+        }
+        NSString * path = [self filePath];
+        if([[NSFileManager defaultManager] fileExistsAtPath:path]){
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        }
+        [dictionary writeToFile:path atomically:NO];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
     }
-    NSString * path = [self filePath];
-    if([[NSFileManager defaultManager] fileExistsAtPath:path]){
-        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    }
-    [dictionary writeToFile:path atomically:NO];
 }
 
 #pragma mark - 增、改
@@ -73,16 +79,22 @@
  @param key key
  */
 - (void)updateValue:(id)value withKey:(NSString *)key{
-    if(value == nil || [value isKindOfClass:[NSNull class]]){
-        value = @"";
+    @try {
+        if(value == nil || [value isKindOfClass:[NSNull class]]){
+            value = @"";
+        }
+        NSDictionary * cache = [self dictionary];
+        NSMutableDictionary * dict = [[NSMutableDictionary alloc]init];
+        if(cache){
+            [dict setValuesForKeysWithDictionary:cache];
+        }
+        [dict setObject:value forKey:key];
+        [self writeWithDictionary:dict];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
     }
-    NSDictionary * cache = [self dictionary];
-    NSMutableDictionary * dict = [[NSMutableDictionary alloc]init];
-    if(cache){
-        [dict setValuesForKeysWithDictionary:cache];
-    }
-    [dict setObject:value forKey:key];
-    [self writeWithDictionary:dict];
 }
 
 /**
@@ -91,21 +103,27 @@
  @param appendDict appendDict
  */
 - (void)updateValuesWithDictionary:(NSDictionary *)appendDict{
-    NSDictionary * cache = [self dictionary];
-    NSMutableDictionary * dict = [[NSMutableDictionary alloc]init];
-    if(cache){
-        [dict setValuesForKeysWithDictionary:cache];
-    }
-    if(appendDict && [appendDict isKindOfClass:[NSDictionary class]]){
-        for (NSString * key in appendDict.allKeys) {
-            id value = appendDict[key];
-            if([value isKindOfClass:[NSNull class]]){
-                value = @"";
-            }
-            [dict setValue:value forKey:key];
+    @try {
+        NSDictionary * cache = [self dictionary];
+        NSMutableDictionary * dict = [[NSMutableDictionary alloc]init];
+        if(cache){
+            [dict setValuesForKeysWithDictionary:cache];
         }
+        if(appendDict && [appendDict isKindOfClass:[NSDictionary class]]){
+            for (NSString * key in appendDict.allKeys) {
+                id value = appendDict[key];
+                if([value isKindOfClass:[NSNull class]]){
+                    value = @"";
+                }
+                [dict setValue:value forKey:key];
+            }
+        }
+        [self writeWithDictionary:dict];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
     }
-    [self writeWithDictionary:dict];
 }
 
 /**
@@ -126,23 +144,35 @@
  @param key key
  */
 - (void)deleteObjectWithKey:(NSString *)key{
-    NSMutableDictionary * tempDict = [[NSMutableDictionary alloc]init];
-    NSDictionary * cache = [self dictionary];
-    if(cache && [cache isKindOfClass:[NSDictionary class]]){
-        [tempDict setValuesForKeysWithDictionary:cache];
+    @try {
+        NSMutableDictionary * tempDict = [[NSMutableDictionary alloc]init];
+        NSDictionary * cache = [self dictionary];
+        if(cache && [cache isKindOfClass:[NSDictionary class]]){
+            [tempDict setValuesForKeysWithDictionary:cache];
+        }
+        [tempDict removeObjectForKey:key];
+        [self writeWithDictionary:tempDict];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
     }
-    [tempDict removeObjectForKey:key];
-    [self writeWithDictionary:tempDict];
 }
 
 /**
  删除所有缓存数据
  */
 - (void)deleteAllObjects{
-    NSString * path = [self filePath];
-    BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:path];
-    if(isExist){
-        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    @try {
+        NSString * path = [self filePath];
+        BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:path];
+        if(isExist){
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        }
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
     }
 }
 
@@ -154,13 +184,20 @@
  @return 所有键值对
  */
 - (NSDictionary *)dictionary{
-    NSString * path = [self filePath];
-    BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:path];
-    if(isExist == NO){
+    @try {
+        NSString * path = [self filePath];
+        BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:path];
+        if(isExist == NO){
+            return nil;
+        }
+        NSDictionary * dict = [[NSDictionary alloc]initWithContentsOfFile:path];
+        return dict;
+    } @catch (NSException *exception) {
         return nil;
+    } @finally {
+        
     }
-    NSDictionary * dict = [[NSDictionary alloc]initWithContentsOfFile:path];
-    return dict;
+ 
 }
 
 /**
@@ -169,15 +206,21 @@
  @param key key
  */
 - (id)valueForKey:(NSString *)key{
-    NSDictionary * dict = [self dictionary];
-    if(dict == nil){
+    @try {
+        NSDictionary * dict = [self dictionary];
+        if(dict == nil){
+            return nil;
+        }
+        if([dict valueForKey:key] == nil){
+            return nil;
+        }
+        id value = dict[key];
+        return value;
+    } @catch (NSException *exception) {
         return nil;
+    } @finally {
+        
     }
-    if([dict valueForKey:key] == nil){
-        return nil;
-    }
-    id value = dict[key];
-    return value;
 }
 
 @end
